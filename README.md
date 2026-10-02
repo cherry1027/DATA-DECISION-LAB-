@@ -1,126 +1,152 @@
-# vinext-starter
+### From Data Enabled → Data Informed → Data Driven
 
-A clean full-stack starter running on [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and Drizzle support.
+A polished Master’s thesis concept prototype exploring how industrial supply-chain data can be transformed from descriptive information into explainable, actionable decisions.
 
-## Prerequisites
+🌐 **[Open the Live Demo](https://nefab-data-decision-lab.charanvaranasi44.workers.dev/)**
 
-- Node.js `>=22.13.0`
-- Portable: Windows, macOS, or Linux; no Bash required
-- Managed Linux: managed Linux runtime with Bash, `flock`, `curl`, `sha256sum`, and GNU `timeout`
-- Git is required only for publishing
+> **Important:** This prototype uses entirely synthetic demonstration data. It does not connect to Nefab systems, contain confidential information, or represent real operational performance.
 
-## Sites Lifecycle
+---
 
-The Sites initializer copies the shared starter and selects managed-linux only when `SITES_MANAGED_LINUX_CONTAINER=1`; otherwise it selects portable. It saves the selection only in ignored `.sites-runtime/execution-profile.json`. Both profiles copy/configure first, then use the plugin's separate `install-dependencies.mjs` step to measure installation independently. Edit source under `app/` and follow the Sites skill for installation, preview, builds, and publishing.
+## The Concept
 
-Run `node <plugin-root>/scripts/configure-execution-profile.mjs` only when the profile is unknown for the current checkout and environment. Profile changes do not alter tracked source or require reinstalling otherwise-valid dependencies; restart an existing preview to use the new selection. Do not commit or upload `.sites-runtime/`.
+Industrial organizations often have access to large amounts of data, but turning that data into confident decisions remains difficult.
 
-This starter does not use `wrangler.jsonc`.
+The Nefab Data Decision Lab demonstrates a three-stage analytics maturity journey:
 
-`install:ci` runs `npm ci` once against the shared lockfile, disables parent-workspace discovery, and includes required dev/optional dependencies despite production/omit settings. Sharp defaults to prebuilt binaries unless explicitly configured otherwise. Do not overlap installers.
+| Stage | Core Question | Prototype Capability |
+|---|---|---|
+| **Data Enabled** | What happened? | Unified analytical data layer |
+| **Data Informed** | Why did it happen? | Root-cause exploration |
+| **Data Driven** | What should we do next? | Interactive decision simulation |
 
-- **Portable:** Preserve host HOME, npm cache, registry, proxy, temporary paths, retry/concurrency settings, and lifecycle-script policy. Use `--prefer-offline --no-audit --no-fund`.
-- **Managed Linux:** Use the existing project-local HOME/cache/tmp setup and Linux install lock, tarball preflight, and timeout. Restore the image-seeded npm cache only when its lockfile hash matches; retain network fallback. Builds keep their existing timeout. These helpers are not invoked by the portable profile.
+The prototype connects executive monitoring, diagnostic analytics, scenario modeling and AI-assisted decision support in one coherent workflow.
 
-`scripts/sites-env.mjs` preserves the caller's HOME, npm cache, proxy, XDG, and temporary-directory configuration while defaulting Wrangler and Miniflare state to the checkout. If npm reports an unwritable cache, select a writable path with `npm_config_cache` for that install. The `dev` and `start` scripts also keep Wrangler logs inside the checkout. Generated `.sites-runtime/` and `.wrangler/` directories are disposable and ignored by Git.
+---
 
-On portable, `npm run dev` uses `vinext dev` with HMR, starting at port 5173. Vinext records the running server in ignored `.vinext/` state, rejects an ordinary duplicate launch, and recovers stale state after a stopped process; exactly simultaneous starts can race. Pass `--port <port>` or `--hostname <host>` after `npm run dev --` when needed; keep portable previews on loopback.
+## Key Experiences
 
-For browser QA on managed Linux, use `sites-preview start`. The project's dev script runs Vite and accepts the supervisor's `--host 0.0.0.0 --port 4173 --strictPort` arguments. The internal browser uses `http://terminal.local:4173/`; it is not a user-facing URL. The supervisor owns the preview lifecycle. The ignored local profile survives the supervisor's cleared process environment.
+### 1. Executive Overview
 
-The portable profile simulates ChatGPT sign-in only for loopback development requests. Visit `/signin-with-chatgpt?return_to=/` to sign in as `local_seedy` (`seedy@sites.test`, display name `Seedy`) and `/signout-with-chatgpt?return_to=/` to sign out. The development cookie preserves that identity across server restarts. Mock auth is disabled in the managed-linux profile and is not included in production builds; hosted authentication remains dispatch-owned.
+A decision-focused dashboard presenting synthetic supply-chain KPIs:
 
-The Worker uses `vinext/server/fetch-handler`, including Vinext's config-aware image handling. After building, `npm start` runs that Worker locally through Wrangler on `127.0.0.1`, sharing `.wrangler/state` with dev preview and local D1 migrations; it does not deploy the site or simulate sign-in. Use the URL printed by the server. Pass `npm start -- --port <port>` to select a different built-preview port.
+- Logistics cost
+- Packaging utilization
+- Damage rate
+- On-time delivery
+- CO₂ estimate
+- Shipment volume
+- Regional performance
+- Trends and optimization signals
 
-Local previews use Miniflare's placeholder `Request.cf` metadata without a network lookup. Set `CLOUDFLARE_CF_FETCH_ENABLED=true` to opt into fetching preview metadata; this setting does not change hosted request metadata.
+The dashboard highlights a potential opportunity involving low packaging utilization and expedited shipments in Region B.
 
-Local tool usage metrics are disabled by default. Set `WRANGLER_SEND_METRICS=true` to opt in.
+### 2. Data Enabled
 
-## Included Shape
+A visual representation of how fragmented information from ERP, logistics, packaging, quality and customer-order systems could become a common analytical layer.
 
-- edit site code under `app/`
-- `app/chatgpt-auth.ts` provides optional dispatch-owned ChatGPT sign-in helpers
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/index.ts` reads the D1 binding from the Cloudflare Worker environment
-- `db/schema.ts` starts intentionally empty
-- `@cloudflare/workers-types` provides Worker types; `cloudflare-env.d.ts` declares optional `DB`/`BUCKET` bindings—update these declarations if binding names change
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+The view includes:
 
-## Workspace Auth Headers
+- Data quality
+- Freshness
+- Coverage
+- Missing values
+- Entity matching
+- Data lineage
+- Shared metric definitions
 
-Signed-in visitors receive both `oai-authenticated-user-id` and `oai-authenticated-user-email`. Private Sites require every visitor to sign in; public Sites may also have anonymous visitors, for whom neither header is present.
+### 3. Root Cause Explorer
 
-The user ID is stable for the same user on the same Site and different across Sites. Use it as the durable user key; use email and name for display or contact purposes.
+Users can investigate changes across five KPIs:
 
-SIWC-authenticated workspace sites may also receive `oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty `name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by `oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
+- Logistics Cost
+- Damage Rate
+- Lead Time
+- CO₂
+- Packaging Utilization
 
-Treat the full name as optional and fall back to email when it is absent:
+Each analysis presents trends, anomaly periods, likely contributors and the regions, categories or customer groups requiring validation.
 
-```tsx
-import { headers } from "next/headers";
+Insights are explicitly presented as synthetic hypotheses—not proven causality.
 
-export default async function Home() {
-  const requestHeaders = await headers();
-  const userId = requestHeaders.get("oai-authenticated-user-id");
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
+### 4. Decision Simulator
 
-  const displayName = fullName ?? email;
-  // ...
-}
-```
+The central experience of the prototype.
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+Users can adjust:
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs optional or required ChatGPT sign-in:
+- Packaging utilization
+- Damage rate
+- Expedited shipment share
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use the returned `userId` as the stable user key for user-owned records; do not use email as a durable identifier.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send anonymous visitors through Sign in with ChatGPT.
-- In a Server Component, start sign-in with `<a href={chatGPTSignInPath(returnTo)} target="_top">`. The auth helper module is server-only; do not import it into a Client Component.
-- Do not use `fetch`, XHR, a client-side router, or a framework link that can prefetch the sign-in route. SIWC must start as a top-level navigation.
-- Never request the AuthAPI authorization endpoint directly. The dispatch-owned `/signin-with-chatgpt` route must start the SIWC flow.
-- Use `chatGPTSignOutPath(returnTo)` for browser sign-out links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because they depend on per-request identity headers.
+The interface dynamically estimates the effect on:
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the OAuth cookies, and identity header injection. Do not implement app routes for those reserved paths. Routes that do not import and call the helper remain anonymous-compatible.
+- Annual logistics cost
+- CO₂ emissions
+- Damage cost
+- On-time delivery
 
-SIWC establishes identity only; it does not prove workspace membership. Use the Sites hosting platform's access policy controls for workspace-wide restrictions, or enforce explicit server-side membership or allowlist checks.
+A recommended scenario explains why specific operational levers were selected while keeping every assumption visible and editable.
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write actions tied to the current ChatGPT user. Leave public content anonymous.
+### 5. AI Decision Copilot
 
-## Local D1 migrations
+A deterministic, ChatGPT-style analytics interface supporting questions such as:
 
-For a D1-backed local preview, generate SQL with `npm run db:generate`. Build once through the Sites skill's build entrypoint (or `npm run build` for standalone use) to generate `dist/server/wrangler.json`, rebuilding if bindings change. From the project root, apply each pending migration in order:
+- Why did logistics cost increase?
+- Which region should we optimize first?
+- What is driving the damage rate?
+- How could we reduce CO₂?
+- Which packaging configurations appear inefficient?
 
-```sh
-node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js d1 execute DB --local --config dist/server/wrangler.json --persist-to .wrangler/state --file drizzle/0000_example.sql
-```
+Every response follows an explainable structure:
 
-Replace the filename with the pending migration and `DB` with your D1 binding name if different. Use `.wrangler/state`, not `.wrangler/state/v3`; Wrangler adds the versioned directories. Do not replay migrations already applied locally. This updates only the preview database; publishing applies production migrations separately.
+1. **Observation**
+2. **Evidence**
+3. **Recommended Action**
+4. **Expected Impact**
+5. **Confidence**
 
-## Diagnostic Commands
+No external AI service is connected. Responses are generated from predefined synthetic scenarios.
 
-- `npm run install:ci`: perform the one locked dependency install
-- `npm run dev`: start the Vite/Vinext development server
-- `npm run build`: build the deployable Sites artifact
-- `npm run start`: preview the built Worker locally with D1/R2 support
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+---
 
-When using the Sites plugin, follow its skill instructions for installation, builds, and publishing. These npm commands remain available for standalone use.
+## Research Direction
 
-The portable build runs Vinext directly without a host `timeout` command. The managed-linux build uses `scripts/build-verified.sh` and its existing `SITES_BUILD_TIMEOUT` setting.
+### Potential Master’s Thesis
 
-## Learn More
+**Research question:**
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+> How can data-enabled analytics and AI-assisted decision support help transform industrial supply-chain data from descriptive information into explainable and actionable decisions?
+
+### Potential Evaluation Dimensions
+
+- Decision usefulness
+- Recommendation accuracy
+- Explainability
+- User trust
+- Data-quality sensitivity
+- Operational relevance
+
+---
+
+## Design Principles
+
+- Scandinavian industrial aesthetic
+- Executive-dashboard clarity
+- Restrained green and teal palette
+- Minimal visual clutter
+- Explainability before automation
+- Visible assumptions and confidence
+- Responsive desktop and mobile layouts
+
+---
+
+## Technology
+
+- Next.js
+- TypeScript
+- React
+- Tailwind CSS
+- Recharts
+- Cloudflare Workers
+- Wrangler
